@@ -41,7 +41,7 @@ public class Node {
 	// 567
 	protected List<Node> neighbours;
 	private boolean isAlive;
-	
+
 	private List<Runnable> nextOps = new ArrayList<>();
 
 	private Node() {
@@ -129,10 +129,6 @@ public class Node {
 		System.out.print(isAlive ? "X" : " ");
 	}
 
-	public void setAlive(boolean isAlive) {
-		this.isAlive = isAlive;
-	}
-
 	public void simulateTick() {
 		long neighborsAlive = neighborsStream().filter(it -> it.isAlive).count();
 
@@ -152,7 +148,7 @@ public class Node {
 			}
 		}
 	}
-	
+
 	public void nextGeneration() {
 		nextOps.forEach(it -> it.run());
 		nextOps.clear();
@@ -160,6 +156,23 @@ public class Node {
 
 	private Stream<Node> neighborsStream() {
 		return IntStream.rangeClosed(0, 7).boxed().map(num -> tryGetNeighbor(num));
+	}
+
+	public void setAlive(boolean isAlive) {
+		this.isAlive = isAlive;
+	}
+
+	public void start() {
+//		if (isAlive) {
+		threads.submit(() -> {
+			while (true) {
+				simulateTick();
+				ThreadingUtil.sleep((int)(Math.random() * 50) + 100);
+				nextGeneration();
+				ThreadingUtil.sleep((int)(Math.random() * 50) + 100);
+			}
+		});
+//		}
 	}
 
 }

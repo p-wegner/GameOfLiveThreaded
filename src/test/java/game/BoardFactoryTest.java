@@ -12,7 +12,7 @@ public class BoardFactoryTest {
 	@Test
 	void testName() throws Exception {
 
-		ExecutorService threads = Executors.newFixedThreadPool(100);
+		ExecutorService threads = Executors.newFixedThreadPool(15*15);
 		Boardfactory boardfactory = new Boardfactory(15, 15);
 		Board b = boardfactory.buildRandom(threads);
 
@@ -23,12 +23,14 @@ public class BoardFactoryTest {
 		// hack: use iterator, otherwise 'walker' with stack required
 		b.iterateByLine(node -> node.linkWithCornerNeighbors());
 
+		b.iterateByLine(node -> node.start());
+		
 		while (true) {
-			b.simulateTick();
-			b.nextGeneration();
+//			b.simulateTick();
+//			b.nextGeneration();
 			b.printByLine(node -> node.printLive());
 			System.out.println("-------------------------------------------------");
-			Thread.sleep(500);
+			Thread.sleep(200);
 		}
 	}
 }
