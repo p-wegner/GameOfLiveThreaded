@@ -1,9 +1,11 @@
-package game;
+package game.main;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
+
+import game.globals.Debug;
+import game.util.Threads;
 
 public class Boardfactory {
 
@@ -15,13 +17,12 @@ public class Boardfactory {
 		this.height = height;
 	}
 
-	public Board buildRandom(ExecutorService threads) {
+	public Board create(Threads threads) {
 		int debugCounter = 0;
 		List<Node> nodes = new ArrayList<>();
 
 		// ___? ? ? ?
 		// ?<-N<-N<-N<-N ...
-		
 		
 		Node top = Node.empty();
 		for (int y = 0; y < height; y++) {
@@ -37,7 +38,7 @@ public class Boardfactory {
 				debugCounter++;
 
 				nodes.add(node);
-				node.linkWithTopLeftNeighbours();
+				node.linkWithTopLeftneighbors();
 
 				left = node;
 				top = top.right();
@@ -48,6 +49,7 @@ public class Boardfactory {
 			top = leftMost;
 		}
 		
+		nodes.forEach(node -> node.linkWithCornerneighbors());
 		Collections.shuffle(nodes);
 		
 		return new Board(nodes, width, height);

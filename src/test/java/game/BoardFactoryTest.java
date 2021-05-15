@@ -7,33 +7,49 @@ import java.util.concurrent.Executors;
 
 import org.junit.jupiter.api.Test;
 
+import game.globals.Stats;
+import game.main.Board;
+import game.main.Boardfactory;
+import game.util.Threads;
+
 public class BoardFactoryTest {
 
 	private static final int Y = 15;
-	private static final int X = 40;
+	private static final int X = 15;
 
 	@Test
 	void testName() throws Exception {
-
-		ExecutorService threads = Executors.newFixedThreadPool(X * Y);
+		ExecutorService executor = Executors.newFixedThreadPool(X * Y);
+		Threads threads = new Threads(executor);
 		Boardfactory boardfactory = new Boardfactory(X, Y);
-		Board b = boardfactory.buildRandom(threads);
+		Board board = boardfactory.create(threads);
 
-		b.printByLine(node -> node.debugPrint());
-		b.iterateByLine(node -> node.setAlive(Math.random() < 0.3));
-		b.printByLine(node -> node.printLive());
+		printLayout(board);
+		setAliveRandom(board);
+		startThreads(board);
 
-		// hack: use iterator, otherwise 'walker' with stack required
-		b.iterateByLine(node -> node.linkWithCornerNeighbors());
+		dumpBoardForever(threads, board);
+	}
 
-		b.iterateByLine(node -> node.start());
-
+	private void dumpBoardForever(Threads threads, Board board) throws InterruptedException {
 		while (true) {
-//			b.simulateTick();
-//			b.nextGeneration();
-			b.printByLine(node -> node.printLive());
+			board.printByLine(node -> node.printLive());
+			System.out.println("Busy threads: " + threads.getBusyCount());
+			System.out.println(Stats.stats());
 			System.out.println("-------------------------------------------------");
 			Thread.sleep(200);
 		}
+	}
+
+	private void startThreads(Board board) {
+		board.iterateByLine(node -> node.start());
+	}
+
+	private void setAliveRandom(Board board) {
+		board.iterateByLine(node -> node.setAlive(Math.random() < 0.3));
+	}
+
+	private void printLayout(Board board) {
+		board.printByLine(node -> node.debugPrint());
 	}
 }

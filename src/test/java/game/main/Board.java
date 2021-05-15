@@ -1,4 +1,4 @@
-package game;
+package game.main;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -15,6 +15,8 @@ public class Board {
 		this.height = height;
 	}
 
+	//TODO: generateString
+	//TODO: move into Node
 	public void printByLine(Consumer<Node> callback) {
 		Consumer<Node> item = node -> {
 			callback.accept(node);
