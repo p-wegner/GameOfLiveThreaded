@@ -28,7 +28,6 @@ public class Node {
 		protected Node tryGetNeighbor(int neighbor) {
 			return this;
 		}
-
 	}
 
 	private ExecutorService threads;
@@ -43,6 +42,8 @@ public class Node {
 	private boolean isAlive;
 
 	private List<Runnable> nextOps = new ArrayList<>();
+	private int wait1 = getWaitTime();
+	private int wait2 = getWaitTime();
 
 	private Node() {
 		// nothing
@@ -126,10 +127,11 @@ public class Node {
 	}
 
 	public void printLive() {
-		System.out.print(isAlive ? "X" : " ");
+		System.out.print(isAlive ? "." : " ");
 	}
 
 	public void simulateTick() {
+		// todo: we take neighbors alive information!
 		long neighborsAlive = neighborsStream().filter(it -> it.isAlive).count();
 
 		if (isAlive) {
@@ -163,16 +165,17 @@ public class Node {
 	}
 
 	public void start() {
-//		if (isAlive) {
 		threads.submit(() -> {
 			while (true) {
 				simulateTick();
-				ThreadingUtil.sleep((int)(Math.random() * 50) + 100);
+				ThreadingUtil.sleep(wait1);
 				nextGeneration();
-				ThreadingUtil.sleep((int)(Math.random() * 50) + 100);
+				ThreadingUtil.sleep(wait2);
 			}
 		});
-//		}
 	}
 
+	private int getWaitTime() {
+		return (int) (Math.random() * 100) + 50;
+	}
 }

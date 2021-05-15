@@ -9,11 +9,14 @@ import org.junit.jupiter.api.Test;
 
 public class BoardFactoryTest {
 
+	private static final int Y = 15;
+	private static final int X = 40;
+
 	@Test
 	void testName() throws Exception {
 
-		ExecutorService threads = Executors.newFixedThreadPool(15*15);
-		Boardfactory boardfactory = new Boardfactory(15, 15);
+		ExecutorService threads = Executors.newFixedThreadPool(X * Y);
+		Boardfactory boardfactory = new Boardfactory(X, Y);
 		Board b = boardfactory.buildRandom(threads);
 
 		b.printByLine(node -> node.debugPrint());
@@ -24,7 +27,7 @@ public class BoardFactoryTest {
 		b.iterateByLine(node -> node.linkWithCornerNeighbors());
 
 		b.iterateByLine(node -> node.start());
-		
+
 		while (true) {
 //			b.simulateTick();
 //			b.nextGeneration();
