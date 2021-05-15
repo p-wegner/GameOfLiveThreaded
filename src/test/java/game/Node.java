@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Node {
 
@@ -38,20 +40,17 @@ public class Node {
 	// 3 4
 	// 567
 	protected List<Node> neighbours;
+	private boolean isAlive;
+	
+	private List<Runnable> nextOps = new ArrayList<>();
 
-	private List<Node> createEmptyNeighbors() {
-		return Arrays.asList(Node.empty(), Node.empty(), Node.empty(),
-				Node.empty(), Node.empty(), Node.empty(), Node.empty(), Node.empty());
-	}
-
-	protected Node() {
+	private Node() {
 		// nothing
 	}
 
-	public Node(ExecutorService threads, Node top, Node left) {
+	public Node(ExecutorService threads, Node top, Node left, boolean isAlive) {
 		this.threads = threads;
-//		this.top = top;
-//		this.left = left;
+		this.isAlive = isAlive;
 		neighbours = new ArrayList<>(createEmptyNeighbors());
 		neighbours.set(1, top);
 		neighbours.set(3, left);
@@ -74,7 +73,7 @@ public class Node {
 	}
 
 	protected void updateNeighbor(int neighbor, Node node) {
-		System.out.println(debug + ": My new " + neighbor + " is " + node.debug);
+		Debug.println(debug + ": My new " + neighbor + " is " + node.debug);
 		neighbours.set(neighbor, node);
 	}
 
@@ -105,12 +104,62 @@ public class Node {
 		// left.linkWithTopLeftNeighbours();
 	}
 
+	public void linkWithCornerNeighbors() {
+		top().left().updateNeighbor(7, this);
+		down().right().updateNeighbor(0, this);
+
+		top().right().updateNeighbor(5, this);
+		down().left().updateNeighbor(2, this);
+	}
+
 	public void setDebug(String debug) {
 		this.debug = debug;
 	}
 
-	public String getDebug() {
-		return debug;
+	private List<Node> createEmptyNeighbors() {
+		return Arrays.asList(Node.empty(), Node.empty(), Node.empty(),
+				Node.empty(), Node.empty(), Node.empty(), Node.empty(), Node.empty());
+	}
+
+	public void debugPrint() {
+		System.out.print(debug);
+	}
+
+	public void printLive() {
+		System.out.print(isAlive ? "X" : " ");
+	}
+
+	public void setAlive(boolean isAlive) {
+		this.isAlive = isAlive;
+	}
+
+	public void simulateTick() {
+		long neighborsAlive = neighborsStream().filter(it -> it.isAlive).count();
+
+		if (isAlive) {
+			if (neighborsAlive < 2) {
+				nextOps.add(() -> this.isAlive = false);
+			}
+			if (neighborsAlive == 2 || neighborsAlive == 3) {
+				nextOps.add(() -> this.isAlive = true);
+			}
+			if (neighborsAlive > 3) {
+				nextOps.add(() -> this.isAlive = false);
+			}
+		} else {
+			if (neighborsAlive == 3) {
+				nextOps.add(() -> this.isAlive = true);
+			}
+		}
+	}
+	
+	public void nextGeneration() {
+		nextOps.forEach(it -> it.run());
+		nextOps.clear();
+	}
+
+	private Stream<Node> neighborsStream() {
+		return IntStream.rangeClosed(0, 7).boxed().map(num -> tryGetNeighbor(num));
 	}
 
 }

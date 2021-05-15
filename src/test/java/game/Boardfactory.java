@@ -1,6 +1,7 @@
 package game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -28,9 +29,10 @@ public class Boardfactory {
 			
 			Node left = Node.empty();
 			for (int x = 0; x < width; x++) {
-				System.out.println("building " + debugCounter);
+				Debug.println("building " + debugCounter);
 				
-				Node node = new Node(threads, top, left);
+				boolean nodeIsOn = Math.random()>0.5;
+				Node node = new Node(threads, top, left, nodeIsOn);
 				node.setDebug("" + debugCounter);
 				debugCounter++;
 
@@ -45,8 +47,10 @@ public class Boardfactory {
 			}
 			top = leftMost;
 		}
-
-		return new Board(nodes);
+		
+		Collections.shuffle(nodes);
+		
+		return new Board(nodes, width, height);
 	}
 
 }

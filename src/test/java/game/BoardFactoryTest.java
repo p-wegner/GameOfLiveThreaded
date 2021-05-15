@@ -1,6 +1,6 @@
 package game;
 
-import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,13 +11,24 @@ public class BoardFactoryTest {
 
 	@Test
 	void testName() throws Exception {
-		
-		ExecutorService threads = Executors.newFixedThreadPool(10);
-		Boardfactory boardfactory = new Boardfactory(10,10);
+
+		ExecutorService threads = Executors.newFixedThreadPool(100);
+		Boardfactory boardfactory = new Boardfactory(15, 15);
 		Board b = boardfactory.buildRandom(threads);
 
-		b.dumpByLine();
-		//b.start();
+		b.printByLine(node -> node.debugPrint());
+		b.iterateByLine(node -> node.setAlive(Math.random() < 0.3));
+		b.printByLine(node -> node.printLive());
+
+		// hack: use iterator, otherwise 'walker' with stack required
+		b.iterateByLine(node -> node.linkWithCornerNeighbors());
+
+		while (true) {
+			b.simulateTick();
+			b.nextGeneration();
+			b.printByLine(node -> node.printLive());
+			System.out.println("-------------------------------------------------");
+			Thread.sleep(500);
+		}
 	}
-	
 }
