@@ -8,6 +8,7 @@ public class NeighborRoutingInfo {
 
 	private NetworkCell sourceNode;
 	private NetworkCell targetNode;
+	//TODO remove
 	private Integer targetPort;
 
 	public NeighborRoutingInfo(NetworkCell sourceNode, NetworkCell targetNode, Integer targetPort) {
@@ -16,8 +17,8 @@ public class NeighborRoutingInfo {
 		this.targetPort = targetPort;
 	}
 
-	//TODO remove getters as far as possible
-	
+	// TODO remove getters as far as possible
+
 	public NetworkCell getSourceNode() {
 		return sourceNode;
 	}
@@ -31,10 +32,12 @@ public class NeighborRoutingInfo {
 	}
 
 	public void send(AliveRequest request) {
+//		Stats.inc("request");
 		targetNode.send(new Message(this, request));
 	}
 
 	public void respond(AliveResponse aliveResponse) {
+//		Stats.inc("respond");
 		sourceNode.send(new Message(this, aliveResponse));
 	}
 }

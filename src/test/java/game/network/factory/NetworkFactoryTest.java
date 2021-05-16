@@ -15,7 +15,7 @@ public class NetworkFactoryTest {
 
 		System.out.println(network.dumpDebug());
 
-		fail();
+		fail("Look into the console");
 	}
 
 	@Test
@@ -25,7 +25,6 @@ public class NetworkFactoryTest {
 
 		System.out.println(network.dumpDebug());
 
-		fail();
+		fail("Look into the console");
 	}
-
 }

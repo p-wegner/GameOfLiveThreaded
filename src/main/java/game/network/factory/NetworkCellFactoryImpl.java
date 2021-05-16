@@ -34,7 +34,7 @@ public class NetworkCellFactoryImpl implements NetworkCellFactory {
 	public NetworkCell create(NetworkCell top, NetworkCell left) {
 		List<NetworkCell> neighbors = createEmptyNeighbors();
 
-		// TODO pretty internal info....
+		// TODO thats pretty internal info.... maybe need neighborsfactory :D
 		neighbors.set(1, top);
 		neighbors.set(3, left);
 

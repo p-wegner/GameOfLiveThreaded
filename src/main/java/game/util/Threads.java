@@ -17,11 +17,17 @@ public class Threads {
 	}
 
 	public void submit(Object supervisingObject, Runnable runnable) {
-		AtomicBoolean threadRunning = threadRunningForObject.putIfAbsent(supervisingObject, new AtomicBoolean(false));
-		if (threadRunning.compareAndExchange(false, true)) {
+		AtomicBoolean threadRunning = threadRunningForObject.computeIfAbsent(supervisingObject,
+				__ -> new AtomicBoolean(false));
+
+		if (!threadRunning.compareAndExchange(false, true)) {
 			executor.submit(() -> {
 				busy.incrementAndGet();
-				runnable.run();
+				try {
+					runnable.run();
+				} catch (Exception ex) {
+					System.out.println("THREADFAIL: " + ex);
+				}
 				busy.decrementAndGet();
 				threadRunning.set(false);
 			});
@@ -31,8 +37,8 @@ public class Threads {
 	public int getBusyCount() {
 		return busy.get();
 	}
-	
+
 	public void randomWaiter(int base, int random) {
-		ThreadingUtil.sleep( (int) (Math.random() * random) + base);
+		ThreadingUtil.sleep((int) (Math.random() * random) + base);
 	}
 }

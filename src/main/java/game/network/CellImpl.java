@@ -64,12 +64,6 @@ public class CellImpl implements NetworkCell {
 		this.debug = debug;
 	}
 
-	// TODO FIX
-//	private Stream<NeighborRoutingInfo> neighborsRoutingStream() {
-//		return IntStream.rangeClosed(0, 7).boxed()
-//				.map(port -> new NeighborRoutingInfo(port, neighbors.get(port)));
-//	}
-
 	@Override
 	public String toString() {
 		return debug;

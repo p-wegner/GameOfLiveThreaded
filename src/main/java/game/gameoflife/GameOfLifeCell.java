@@ -2,12 +2,13 @@ package game.gameoflife;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
-import game.api.NetworkCell;
 import game.globals.Stats;
 import game.network.CellAware;
 import game.network.NavigatableCell;
 import game.network.messages.Message;
+import game.network.messages.NeighborRoutingInfo;
 import game.util.Threads;
 
 public class GameOfLifeCell implements CellAware {
@@ -18,13 +19,17 @@ public class GameOfLifeCell implements CellAware {
 	private Runnable nextOp = null;
 	private int tick = 0;
 
-	// TODO should not be navigatable cell, but facade
+	// TODO should not be navigatable cell, but facade for messaging/message-routing
 	private NavigatableCell container;
 
-	private LifeCommunicator lifeCommunicator = new LifeCommunicator(this);
+	private GameOfLifeConfig config;
+	private LifeCommunicator lifeCommunicator;
 
-	public GameOfLifeCell(Threads threads) {
+
+	public GameOfLifeCell(Threads threads, GameOfLifeConfig config) {
 		this.threads = threads;
+		this.config = config;
+		this.lifeCommunicator = new LifeCommunicator(this, config.getGenerationInterval());
 	}
 
 	public boolean isAlive() {
@@ -40,14 +45,15 @@ public class GameOfLifeCell implements CellAware {
 	}
 
 	private void gameOfLifeLoop() {
-		// we need to initially send out requests, so that we can receive valid answers,
-		// otherwise initial responses alive neighbors would be 0
-		lifeCommunicator.requestNeighborAliveStatus(container);
+		// we need to initially send out requests
+		// after that we can receive then send in the loop
+		lifeCommunicator.requestNeighborAliveStatus();
+
 		while (true) {
 			tick();
-			threads.randomWaiter(50, 100);
+			// threads.randomWaiter(100, 100);
 			updateGeneration();
-			threads.randomWaiter(50, 100);
+			threads.randomWaiter(config.getTickBaseWait(), config.getTickRandomWait());
 		}
 	}
 
@@ -58,7 +64,7 @@ public class GameOfLifeCell implements CellAware {
 
 		if (responses.isPresent()) {
 			List<AliveResponse> aliveResponses = responses.get();
-			gameLogik(aliveResponses.size());
+			gameLogic(aliveResponses.size());
 		}
 	}
 
@@ -67,7 +73,7 @@ public class GameOfLifeCell implements CellAware {
 		nextOp = null;
 	}
 
-	private void gameLogik(int neighborsAlive) {
+	private void gameLogic(int neighborsAlive) {
 		if (alive) {
 			if (neighborsAlive < 2) {
 				Stats.inc("alive < 2");
@@ -85,6 +91,8 @@ public class GameOfLifeCell implements CellAware {
 			if (neighborsAlive == 3) {
 				Stats.inc("alive == 3");
 				nextOp = () -> this.alive = true;
+			} else {
+//				Stats.inc("alive != 3 (self !alive)");
 			}
 		}
 	}
@@ -102,18 +110,14 @@ public class GameOfLifeCell implements CellAware {
 
 	@Override
 	public void send(Message message) {
-		if (!alive) {
-			return;
-		}
+		// as long as each one handles itself we have to handle messages even if !alive
+//		if (!alive) {
+//			return;
+//		}
 		lifeCommunicator.handle(message);
 	}
 
-	public void validateRequest(NetworkCell sourceNode, NetworkCell targetNode) {
-		if (targetNode != this) {
-			throw new RuntimeException("TARGETNODE WRONG");
-		}
-		if (!container.containsNeighbor(sourceNode)) {
-			throw new RuntimeException("This is not my neighbor!!");
-		}
+	public void sendNeighbors(Consumer<NeighborRoutingInfo> consumer) {
+		container.neighborsRoutingStream().forEach(consumer);
 	}
 }

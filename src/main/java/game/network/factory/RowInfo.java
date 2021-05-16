@@ -8,7 +8,6 @@ public class RowInfo {
 
 	public RowInfo(NetworkCell leftMost) {
 		this.leftMost = leftMost;
-		// TODO Auto-generated constructor stub
 	}
 
 	public NetworkCell getLeftMost() {

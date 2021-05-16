@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import game.api.NetworkCell;
+import game.globals.Stats;
 import game.network.NavigatableCell;
 import game.network.messages.Message;
 import game.network.messages.NeighborRoutingInfo;
@@ -14,24 +16,26 @@ public class LifeCommunicator {
 
 	private List<AliveRequest> requests = Collections.synchronizedList(new ArrayList<>());
 	private List<AliveResponse> responses = Collections.synchronizedList(new ArrayList<>());
-	private MessageId messageId = new MessageId(0);
+	private MessageId messageId;
 	private GameOfLifeCell gameOfLifeCell;
+	private boolean debug = false;
 
-	public LifeCommunicator(GameOfLifeCell gameOfLifeCell) {
+	public LifeCommunicator(GameOfLifeCell gameOfLifeCell, int generationInterval) {
 		this.gameOfLifeCell = gameOfLifeCell;
+		this.messageId = new MessageId(generationInterval);
 	}
 
-	public void requestNeighborAliveStatus(NavigatableCell container) {
-		// TODO cell.sendNeighbors(msg)
-		container.neighborsRoutingStream()
-				.forEach(routing -> {
-					AliveRequest request = new AliveRequest(routing, messageId.getId());
-					routing.send(request);
-				});
+	public void requestNeighborAliveStatus() {
+		gameOfLifeCell.sendNeighbors(routing -> routing.send(new AliveRequest(routing, messageId.getId())));
 	}
 
 	public List<AliveResponse> evaluateAliveResponses() {
 		List<AliveResponse> responsesCopy = atomicSwitchResponses();
+
+		long filtered = responsesCopy.stream().filter(response -> response.getMessageId() == messageId.getId()).count();
+		long all = responsesCopy.size();
+		Stats.histo("filteredresponses", all - filtered);
+
 		List<AliveResponse> alive = responsesCopy.stream()
 				.filter(response -> response.getMessageId() == messageId.getId())
 				.collect(Collectors.toList());
@@ -42,10 +46,16 @@ public class LifeCommunicator {
 		if (!gameOfLifeCell.isAlive()) {
 			return;
 		}
+
 		List<AliveRequest> requestsCopy = atomicSwitchRequests();
+		Stats.histo("requests", requestsCopy.size());
 		requestsCopy.forEach(request -> {
 			NeighborRoutingInfo routing = request.getRouting();
-			gameOfLifeCell.validateRequest(routing.getSourceNode(), routing.getTargetNode());
+
+			if (this.debug) {
+				validateRequest(routing.getSourceNode(), routing.getTargetNode());
+			}
+
 			request.getRouting().respond(new AliveResponse(request));
 		});
 	}
@@ -63,15 +73,18 @@ public class LifeCommunicator {
 	}
 
 	public void handle(Message message) {
-		message.ifPresent(AliveRequest.class, request -> requests.add(request));
-		message.ifPresent(AliveResponse.class, request -> responses.add(request));
+		if (gameOfLifeCell.isAlive()) {
+			message.ifPresent(AliveRequest.class, request -> requests.add(request));
+		}
+
+		message.ifPresent(AliveResponse.class, response -> responses.add(response));
 	}
 
 	public boolean timeForNextAliveRequest(int tick) {
 		return messageId.isElapsed(tick);
 	}
 
-	// TODO not too awesome signature
+	// TODO signature not awesome
 	public Optional<List<AliveResponse>> communicate(int tick) {
 		answerAliveRequests();
 
@@ -80,9 +93,23 @@ public class LifeCommunicator {
 
 			messageId.nextId(tick);
 			// TODO getter not cool
-			requestNeighborAliveStatus(gameOfLifeCell.getContainer());
+			requestNeighborAliveStatus();
 			return Optional.of(alive);
 		}
 		return Optional.empty();
 	}
+
+	// debugging
+	public void validateRequest(NetworkCell sourceNode, NetworkCell targetNode) {
+		NavigatableCell container = gameOfLifeCell.getContainer();
+		if (targetNode != container) {
+			Stats.inc("!!WRONGTARGET");
+			throw new RuntimeException("TARGETNODE WRONG");
+		}
+		if (!container.containsNeighbor(sourceNode)) {
+			Stats.inc("!!WRONGSOURCE");
+			throw new RuntimeException("This is not my neighbor!!");
+		}
+	}
+
 }

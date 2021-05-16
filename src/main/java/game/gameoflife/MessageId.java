@@ -6,10 +6,11 @@ public class MessageId {
 	private int tick = 0;
 	private int tickInterval;
 
+	// TODO danger constructor very unclear -> factorymethod!
 	public MessageId(int tickInterval) {
 		this.tickInterval = tickInterval;
 		// fire the first time
-		//this.tick = -tickInterval-1;
+		// this.tick = -tickInterval-1;
 	}
 
 	public void nextId(int tick) {

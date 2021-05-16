@@ -1,6 +1,9 @@
 package game.network.factory;
 
 import game.api.NetworkCell;
+import game.network.CellAware;
+import game.network.NavigatableCell;
+import game.network.messages.Message;
 
 public interface NetworkCellFactory {
 
@@ -9,6 +12,22 @@ public interface NetworkCellFactory {
 	NetworkCell createEmpty();
 	
 	static NetworkCellFactory createDefault() {
-		return new NetworkCellFactoryImpl(() -> null);
+		return new NetworkCellFactoryImpl(() -> new CellAware() {
+			
+			@Override
+			public void send(Message message) {
+				//
+			}
+			
+			@Override
+			public void setContainer(NavigatableCell container) {
+				//
+			}
+			
+			@Override
+			public NavigatableCell getContainer() {
+				return null;
+			}
+		});
 	}
 }
