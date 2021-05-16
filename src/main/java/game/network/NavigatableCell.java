@@ -2,14 +2,12 @@ package game.network;
 
 import java.util.Iterator;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import game.api.DataContainer;
 import game.api.NetworkCell;
-import game.gameoflife.AliveRequest;
-import game.main.NeighborRoutingInfo;
+import game.network.messages.NeighborRoutingInfo;
 
 public interface NavigatableCell extends DataContainer {
 

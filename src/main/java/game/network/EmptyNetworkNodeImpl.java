@@ -2,9 +2,9 @@ package game.network;
 
 import java.util.stream.Stream;
 
-import game.api.Message;
 import game.api.NetworkCell;
-import game.main.NeighborRoutingInfo;
+import game.network.messages.Message;
+import game.network.messages.NeighborRoutingInfo;
 
 public class EmptyNetworkNodeImpl implements NetworkCell {
 
@@ -76,5 +76,10 @@ public class EmptyNetworkNodeImpl implements NetworkCell {
 	@Override
 	public void send(Message message) {
 		// nothing
+	}
+
+	@Override
+	public boolean containsNeighbor(NetworkCell node) {
+		return false;
 	}
 }

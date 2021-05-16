@@ -31,5 +31,8 @@ public class Threads {
 	public int getBusyCount() {
 		return busy.get();
 	}
-
+	
+	public void randomWaiter(int base, int random) {
+		ThreadingUtil.sleep( (int) (Math.random() * random) + base);
+	}
 }

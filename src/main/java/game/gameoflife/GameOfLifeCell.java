@@ -3,12 +3,11 @@ package game.gameoflife;
 import java.util.List;
 import java.util.Optional;
 
-import game.api.Message;
 import game.api.NetworkCell;
 import game.globals.Stats;
 import game.network.CellAware;
 import game.network.NavigatableCell;
-import game.util.ThreadingUtil;
+import game.network.messages.Message;
 import game.util.Threads;
 
 public class GameOfLifeCell implements CellAware {
@@ -46,9 +45,9 @@ public class GameOfLifeCell implements CellAware {
 		lifeCommunicator.requestNeighborAliveStatus(container);
 		while (true) {
 			tick();
-			ThreadingUtil.sleep(100);
+			threads.randomWaiter(50, 100);
 			updateGeneration();
-			ThreadingUtil.sleep(100);
+			threads.randomWaiter(50, 100);
 		}
 	}
 

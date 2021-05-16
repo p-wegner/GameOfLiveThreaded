@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import game.api.Message;
-import game.main.NeighborRoutingInfo;
-import game.main.Node;
 import game.network.NavigatableCell;
+import game.network.messages.Message;
+import game.network.messages.NeighborRoutingInfo;
 
 public class LifeCommunicator {
 

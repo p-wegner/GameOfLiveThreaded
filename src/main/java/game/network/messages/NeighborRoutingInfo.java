@@ -1,6 +1,5 @@
-package game.main;
+package game.network.messages;
 
-import game.api.Message;
 import game.api.NetworkCell;
 import game.gameoflife.AliveRequest;
 import game.gameoflife.AliveResponse;

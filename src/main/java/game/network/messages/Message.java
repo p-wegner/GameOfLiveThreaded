@@ -1,8 +1,6 @@
-package game.api;
+package game.network.messages;
 
 import java.util.function.Consumer;
-
-import game.main.NeighborRoutingInfo;
 
 public class Message {
 

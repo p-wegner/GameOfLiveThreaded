@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import game.api.Message;
 import game.api.NetworkCell;
-import game.main.NeighborRoutingInfo;
+import game.network.messages.Message;
+import game.network.messages.NeighborRoutingInfo;
 
 public class CellImpl implements NetworkCell {
 
@@ -94,5 +94,10 @@ public class CellImpl implements NetworkCell {
 	@Override
 	public void send(Message message) {
 		data.send(message);
+	}
+
+	@Override
+	public boolean containsNeighbor(NetworkCell node) {
+		return neighbors.contains(node);
 	}
 }

@@ -1,6 +1,6 @@
 package game.gameoflife;
 
-import game.main.NeighborRoutingInfo;
+import game.network.messages.NeighborRoutingInfo;
 
 public class AliveRequest {
 
