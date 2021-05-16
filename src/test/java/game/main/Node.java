@@ -18,7 +18,7 @@ import game.globals.Stats;
 import game.util.ThreadingUtil;
 import game.util.Threads;
 
-public class Node implements NetworkSetupApi {
+public class Node {
 
 	private String debug;
 

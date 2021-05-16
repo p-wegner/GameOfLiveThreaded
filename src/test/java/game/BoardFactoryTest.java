@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import game.globals.Stats;
 import game.main.Board;
 import game.main.Boardfactory;
+import game.util.ThreadingUtil;
 import game.util.Threads;
 
 public class BoardFactoryTest {
@@ -37,7 +38,7 @@ public class BoardFactoryTest {
 			System.out.println("Busy threads: " + threads.getBusyCount());
 			System.out.println(Stats.stats());
 			System.out.println("-------------------------------------------------");
-			Thread.sleep(200);
+			ThreadingUtil.sleep(200);
 		}
 	}
 

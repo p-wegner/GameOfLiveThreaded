@@ -1,6 +1,7 @@
 package game.main;
 
 public class EmptyNode extends Node {
+	
 	public EmptyNode() {
 		// important: use do nothing constructor, or else emptynode depends on
 		// emptynodes (infinite loop)
@@ -14,10 +15,6 @@ public class EmptyNode extends Node {
 
 	protected void updateNeighbor(int neighbor, Node node) {
 		// nothing
-	}
-
-	protected Node tryGetNeighbor(int neighbor) {
-		return this;
 	}
 
 	public void start() {
