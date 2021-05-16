@@ -1,8 +1,10 @@
-package game;
+package game.gameoflife;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+
+import game.gameoflife.MessageId;
 
 public class MessageIdTest {
 

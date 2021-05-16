@@ -1,4 +1,4 @@
-package game;
+package game.gameoflife;
 
 public class MessageId {
 

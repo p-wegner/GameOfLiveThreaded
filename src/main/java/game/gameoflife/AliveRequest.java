@@ -1,21 +1,16 @@
-package game;
+package game.gameoflife;
 
-import game.main.Node;
+import game.main.NeighborRoutingInfo;
 
 public class AliveRequest {
 
-	private Node source;
+	// TODO move routing into message
 	private NeighborRoutingInfo routing;
 	private int messageId;
 
-	public AliveRequest(Node source, NeighborRoutingInfo routing, int messageId) {
-		this.source = source;
+	public AliveRequest(NeighborRoutingInfo routing, int messageId) {
 		this.routing = routing;
 		this.messageId = messageId;
-	}
-
-	public Node getSource() {
-		return source;
 	}
 
 	public NeighborRoutingInfo getRouting() {

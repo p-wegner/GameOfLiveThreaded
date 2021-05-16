@@ -1,4 +1,4 @@
-package game.main.gen2;
+package game.network.factory;
 
 public class DebugInfoFactory {
 

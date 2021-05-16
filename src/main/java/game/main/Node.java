@@ -9,10 +9,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import game.AliveRequest;
-import game.AliveResponse;
-import game.MessageId;
-import game.NeighborRoutingInfo;
+import game.gameoflife.AliveRequest;
+import game.gameoflife.AliveResponse;
+import game.gameoflife.MessageId;
 import game.globals.Debug;
 import game.globals.Stats;
 import game.util.ThreadingUtil;
@@ -245,13 +244,13 @@ public class Node {
 //		boolean wasSetAlive = !this.isAlive && isAlive;
 		this.isAlive = isAlive;
 //		if (wasSetAlive) {
-		start();
+		//start();
 //		}
 	}
 
 	public void start() {
 		if (/* isAlive && */ threadRunning.compareAndExchange(false, true)) {
-			threads.submit(() -> {
+			threads.submit(this, () -> {
 				lifeAction();
 				threadRunning.set(false);
 			});

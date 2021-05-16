@@ -1,8 +1,8 @@
-package game.main.gen2;
+package game.api;
 
 public interface NeighborEditable {
 
-	void updateNeighbor(int neighbor, NetworkNode node);
+	void updateNeighbor(int neighbor, NetworkCell node);
 
 	void linkWithTopLeftneighbors();
 
