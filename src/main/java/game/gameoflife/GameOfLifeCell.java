@@ -25,7 +25,6 @@ public class GameOfLifeCell implements CellAware {
 	private GameOfLifeConfig config;
 	private LifeCommunicator lifeCommunicator;
 
-
 	public GameOfLifeCell(Threads threads, GameOfLifeConfig config) {
 		this.threads = threads;
 		this.config = config;
@@ -74,27 +73,22 @@ public class GameOfLifeCell implements CellAware {
 	}
 
 	private void gameLogic(int neighborsAlive) {
-		if (alive) {
-			if (neighborsAlive < 2) {
-				Stats.inc("alive < 2");
-				nextOp = () -> this.alive = false;
-			}
-			if (neighborsAlive == 2 || neighborsAlive == 3) {
-				Stats.inc("alive == 2");
-				nextOp = () -> this.alive = true;
-			}
-			if (neighborsAlive > 3) {
-				Stats.inc("alive > 3");
-				nextOp = () -> this.alive = false;
-			}
-		} else {
-			if (neighborsAlive == 3) {
-				Stats.inc("alive == 3");
-				nextOp = () -> this.alive = true;
-			} else {
-//				Stats.inc("alive != 3 (self !alive)");
-			}
+		Stats.inc("alive " + describeComparison(neighborsAlive));
+		nextOp = () -> this.alive = nextAliveState(neighborsAlive);
+	}
+
+	private boolean nextAliveState(int neighborsAlive) {
+		return WillLiveRuleProvider.oneRuleMatches(this.alive, neighborsAlive);
+	}
+
+	private String describeComparison(int neighborsAlive) {
+		if (WillLiveRule.NEEDED_NEIGHBOURS_TO_SURVIVE.contains(neighborsAlive)) {
+			return "== " + neighborsAlive;
 		}
+		if (neighborsAlive > 3) {
+			return " > 3";
+		}
+		return " < 2";
 	}
 
 	// TODO remove
